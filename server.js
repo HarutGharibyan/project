@@ -73,11 +73,12 @@ app.delete('/:index', (req, res) => {
 });
 
 app.patch('/:index', (req, res) => {
-  const { body, params } = req;
-  const index = Number(params.index);
-  console.log('patch', body);
-  console.log('patch', index);
-  res.send('Hello World!');
+  // const { body, params } = req;
+  // const index = Number(params.index);
+  // console.log('patch', body);
+  // console.log('patch', index);
+  // res.send('Hello World!');
+
 });
 
 app.listen(port, () => {

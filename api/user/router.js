@@ -1,76 +1,49 @@
 import express from 'express';
+
+import { body, param } from 'express-validator';
 import path from 'path';
+import { expressValidationResult } from '../../utils/middlewares.js';
+import { nameLength, nameOnlyLaters, age } from '../../constants/errorMessages.js';
 import {
-  creteFile, readFile, writeFile, isExists,
+  create, getAll, getOne, remove, update,
+} from './controller.js';
+
+import {
+  readFile,
 } from '../../utils/fs.js';
 
-import { nameValidatr } from '../../utils/helper.js';
-
-const usersUrl = path.resolve('users.json');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
+router.get('/', getAll);
+
+const usersUrl = path.resolve('api/user/users.json');
+router.get(
+  '/:index',
+  param('index').isInt({ min: 0 }),
+  param('index').custom(async (index) => {
     const users = await readFile(usersUrl);
-    res.send(users);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-router.get('/:index', async (req, res) => {
-  try {
-    const { params } = req;
-    const index = Number(params.index);
-    const users = await readFile(usersUrl);
-
-    if (index < 0 || index >= users.length) {
-      return res.status(404).send('error user is not founded');
+    if (index >= users.length) {
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return Promise.reject('error user is not founded');
     }
-    const user = users[index];
+  }),
+  expressValidationResult,
+  getOne,
+);
 
-    return res.send(user);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
-});
+router.post(
+  '/',
+  body('fname', nameLength).isLength({ min: 4 }),
+  body('fname', nameOnlyLaters).isAlpha(),
+  body('lname', nameLength).isLength({ min: 4 }),
+  body('lname', nameOnlyLaters).isAlpha(),
+  body('age', age).isInt({ min: 0, max: 100 }),
+  expressValidationResult,
+  create,
+);
 
-router.post('/', async (req, res) => {
-  try {
-    const { body } = req;
-    if (!isExists(usersUrl)) {
-      await creteFile('users.json');
-    }
-    nameValidatr(body.lname);
-    nameValidatr(body.fname);
+router.delete('/:index', remove);
 
-    let users = await readFile(usersUrl);
-    if (!users) {
-      users = [];
-    }
-    users.push(body);
-    await writeFile(usersUrl, users);
-    console.log('post', body);
-    return res.send(JSON.stringify(body));
-  } catch (err) {
-    console.log('aaaaaaaaaaaaa', err);
-    return res.status(400).send(err.message);
-  }
-});
-
-router.delete('/:index', (req, res) => {
-  const { params } = req;
-  const index = Number(params.index);
-  console.log('delete', index);
-  res.send('Hello World!');
-});
-
-router.patch('/:index', (req, res) => {
-  const { body, params } = req;
-  const index = Number(params.index);
-  console.log('patch', body);
-  console.log('patch', index);
-  res.send('Hello World!');
-});
+router.patch('/:index', update);
 
 export default router;

@@ -1,31 +1,25 @@
 import express from 'express';
-
 import { body, param } from 'express-validator';
-import path from 'path';
 import { expressValidationResult } from '../../utils/middlewares.js';
 import { nameLength, nameOnlyLaters, age } from '../../constants/errorMessages.js';
 import {
   create, getAll, getOne, remove, update,
 } from './controller.js';
-
-import {
-  readFile,
-} from '../../utils/fs.js';
+import { getAllService } from './service.js';
 
 const router = express.Router();
 
 router.get('/', getAll);
 
-const usersUrl = path.resolve('api/user/users.json');
 router.get(
   '/:index',
   param('index').isInt({ min: 0 }),
-  param('index').custom(async (index) => {
-    const users = await readFile(usersUrl);
-    if (index >= users.length) {
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject('error user is not founded');
+  param('index').toInt().custom(async (value) => {
+    const geted = await getAllService();
+    if (value > geted.length) {
+      return Promise.reject();
     }
+    return true;
   }),
   expressValidationResult,
   getOne,
@@ -44,6 +38,16 @@ router.post(
 
 router.delete('/:index', remove);
 
-router.patch('/:index', update);
+router.patch(
+  '/:index',
+  param('index').isInt({ min: 0 }),
+  body('fname', nameLength).optional().isLength({ min: 4 }),
+  body('fname', nameOnlyLaters).optional().isAlpha(),
+  body('lname', nameLength).optional().isLength({ min: 4 }),
+  body('lname', nameOnlyLaters).optional().isAlpha(),
+  body('age', age).optional().isInt({ min: 0, max: 100 }),
+  expressValidationResult,
+  update,
+);
 
 export default router;

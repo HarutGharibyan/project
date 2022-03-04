@@ -1,61 +1,49 @@
-import path from 'path';
 import {
-  creteFile, readFile, writeFile, isExists,
-} from '../../utils/fs.js';
+  createService, getOneService, getAllService, updateService, removeService,
+} from './service.js';
 
-const usersUrl = path.resolve('api/user/users.json');
-export async function getAll(req, res) {
+export async function getAll(req, res, next) {
   try {
-    const users = await readFile(usersUrl);
-    res.send(users);
+    const geted = await getAllService();
+    return res.send(geted);
   } catch (err) {
-    console.log(err);
+    return next(err);
   }
 }
-export async function getOne(req, res) {
+export async function getOne(req, res, next) {
   try {
     const { params } = req;
-    const index = Number(params.index);
-    const users = await readFile(usersUrl);
-
-
-    const user = users[index];
-
-    return res.send(user);
+    const geted = getOneService(params);
+    return res.send(geted);
   } catch (err) {
-    return res.status(400).send(err);
+    return next(err);
   }
 }
-export async function create(req, res) {
+export async function create(req, res, next) {
   try {
     const { body } = req;
-    if (!isExists(usersUrl)) {
-      await creteFile('api/user/users.json');
-    }
-    let users = await readFile(usersUrl);
-    if (!users) {
-      users = [];
-    }
-    users.push(body);
-    await writeFile(usersUrl, users);
-    console.log('post', body);
-    return res.send(JSON.stringify(body));
+    const creted = await createService(body);
+    return res.send(JSON.stringify(creted));
   } catch (err) {
-    console.log('aaaaaaaaaaaaa', err);
-    return res.status(400).send(err.message);
+    return next(err);
   }
 }
 
-export function update(req, res) {
-  const { body, params } = req;
-  const index = Number(params.index);
-  console.log('patch', body);
-  console.log('patch', index);
-  res.send('Hello World!');
+export function update(req, res, next) {
+  try {
+    const { params, body } = req;
+    const updaed = updateService(params, body);
+    return res.send(JSON.stringify(updaed));
+  } catch (err) {
+    return next(err);
+  }
 }
-export function remove(req, res) {
-  const { params } = req;
-  const index = Number(params.index);
-  console.log('delete', index);
-  res.send('Hello World!');
+export function remove(req, res, next) {
+  try {
+    const { params } = req;
+    const removed = removeService(params);
+    return res.send(JSON.stringify(removed));
+  } catch (err) {
+    return next(err);
+  }
 }

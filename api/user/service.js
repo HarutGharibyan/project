@@ -1,40 +1,32 @@
-import path from 'path';
-import {
-  creteFile, readFile, writeFile, isExists,
-} from '../../utils/fs.js';
-
-const usersUrl = path.resolve('api/user/users.json');
+import mongoose from 'mongoose';
+import User from '../../models/user.js';
 
 export async function getAllService() {
-  const users = await readFile(usersUrl);
+  const users = await User.find();
   return users;
 }
 
-export async function getOneService(params) {
-  const index = Number(params.index);
-  const users = await readFile(usersUrl);
-  const user = users[index];
+export async function getOneService(id) {
+  const user = await User.findById(id);
   return user;
 }
 
 export async function createService(body) {
-  if (!isExists(usersUrl)) {
-    await creteFile('api/user/users.json');
-  }
-  let users = await readFile(usersUrl);
-  if (!users) {
-    users = [];
-  }
-  users.push(body);
-  await writeFile(usersUrl, users);
-  return body;
+  const user = new User({
+    _id: mongoose.Types.ObjectId(),
+    ...body,
+  });
+  await user.save();
+
+  return user;
 }
 
-export async function updateService(params, body) {
-  return params + body;
+export async function updateService(id, body) {
+  const user = await User.updateOne({ _id: id }, body);
+  return user;
 }
 
-export function removeService(params) {
-  const index = Number(params.index);
-  return index;
+export async function removeService(id) {
+  const user = await User.remove({ _id: id });
+  return user;
 }

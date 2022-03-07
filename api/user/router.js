@@ -5,22 +5,24 @@ import { nameLength, nameOnlyLaters, age } from '../../constants/errorMessages.j
 import {
   create, getAll, getOne, remove, update,
 } from './controller.js';
-import { getAllService } from './service.js';
+import { getOneService } from './service.js';
 
 const router = express.Router();
 
 router.get('/', getAll);
 
+async function getValidator(value) {
+  const geted = await getOneService(value);
+  if (!geted) {
+    // eslint-disable-next-line prefer-promise-reject-errors
+    return Promise.reject('user not found');
+  }
+  return true;
+}
+
 router.get(
-  '/:index',
-  param('index').isInt({ min: 0 }),
-  param('index').toInt().custom(async (value) => {
-    const geted = await getAllService();
-    if (value > geted.length) {
-      return Promise.reject();
-    }
-    return true;
-  }),
+  '/:id',
+  param('id').custom(getValidator),
   expressValidationResult,
   getOne,
 );
@@ -36,16 +38,22 @@ router.post(
   create,
 );
 
-router.delete('/:index', remove);
+router.delete(
+  '/:id',
+  param('id').custom(getValidator),
+  expressValidationResult,
+  remove,
+);
 
 router.patch(
-  '/:index',
-  param('index').isInt({ min: 0 }),
+  '/:id',
+  param('id').custom(getValidator),
   body('fname', nameLength).optional().isLength({ min: 4 }),
   body('fname', nameOnlyLaters).optional().isAlpha(),
   body('lname', nameLength).optional().isLength({ min: 4 }),
   body('lname', nameOnlyLaters).optional().isAlpha(),
   body('age', age).optional().isInt({ min: 0, max: 100 }),
+  body('_id', 'can not update id').optional().custom(() => Promise.reject()),
   expressValidationResult,
   update,
 );

@@ -12,36 +12,35 @@ export async function getAll(req, res, next) {
 }
 export async function getOne(req, res, next) {
   try {
-    const { params } = req;
-    const geted = getOneService(params);
-    return res.send(geted);
+    const { params: { id } } = req;
+    const geted = await getOneService(id);
+    return res.send(JSON.stringify(geted));
   } catch (err) {
     return next(err);
   }
 }
 export async function create(req, res, next) {
   try {
-    const { body } = req;
-    const creted = await createService(body);
+    const creted = await createService(req.body);
     return res.send(JSON.stringify(creted));
   } catch (err) {
     return next(err);
   }
 }
 
-export function update(req, res, next) {
+export async function update(req, res, next) {
   try {
-    const { params, body } = req;
-    const updaed = updateService(params, body);
+    const { params: { id }, body } = req;
+    const updaed = await updateService(id, body);
     return res.send(JSON.stringify(updaed));
   } catch (err) {
     return next(err);
   }
 }
-export function remove(req, res, next) {
+export async function remove(req, res, next) {
   try {
-    const { params } = req;
-    const removed = removeService(params);
+    const { params: { id } } = req;
+    const removed = await removeService(id);
     return res.send(JSON.stringify(removed));
   } catch (err) {
     return next(err);

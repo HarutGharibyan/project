@@ -1,50 +1,61 @@
 import express from 'express';
-import path from 'path';
-import {
-  creteFile, readFile, writeFile, isExists,
-} from '../../utils/fs.js';
+import { body, param, validationResult } from 'express-validator';
+import { expressValidationResult } from '../../utils/middlewares.js';
+import{getAll,getOne,create,remove,update} from '../product/controller.js'
+import { getAllService, } from './service.js';
+import{nameLength,nameOnlyLaters,price,weight,index } from '../product/errorMessage.js'
 
-const usersUrl = path.resolve('product.json');
 const router = express.Router();
-
-router.get('/', (req, res) => {
-  res.send('Hello World product!');
-});
-
-router.get('/:index', (req, res) => {
-  const { params } = req;
-  const index = Number(params.index);
-  res.send('Hello World!');
-});
-
-router.post('/', async (req, res) => {
-  try {
-    const { body } = req;
-    if (!isExists(usersUrl)) {
-      await creteFile('users.json');
+router.get("/",getAll)
+router.get(
+  '/:index',
+  param('index').isInt({ min: 0 }),
+  param('index').toInt().custom(async (value) => {
+    const geted = await getAllService();
+    if (value > geted.length) {
+      Promise.reject()
     }
-    let users = await readFile(usersUrl);
-    if (!users) {
-      users = [];
-    }
-    users.push(body);
-    await writeFile(usersUrl, users);
-    res.send(JSON.stringify(body));
-  } catch (err) {
+    return true;
+  }),
+  expressValidationResult,
+  
+  
+ getOne
+    
+);
+router.post(
+  '/',
+  body('producttype',nameLength ).isLength({ min: 2 }),
+  body('producttype',nameOnlyLaters ).isAlpha(),
+  // body('productcolor', nameLength).isHexColor(),
+  body('productweight',weight ).isInt({ min: 1 }),
+  body('productprice',price).isInt({ min: 1,}),
+  expressValidationResult,
+  create,
+);
+router.delete('/:index',param('index').toInt().custom(async (value) => {
+  const geted = await getAllService();
+  console.log(geted)
+  if (value > geted.length) {
+    
+       throw Error(index)
   }
-});
-
-router.delete('/:index', (req, res) => {
-  const { params } = req;
-  const index = Number(params.index);
-  res.send('Hello World!');
-});
-
-router.patch('/:index', (req, res) => {
-  const { body, params } = req;
-  const index = Number(params.index);
-
-  res.send('Hello World!');
-});
-
-export default router;
+  return true;
+}),
+expressValidationResult, 
+remove);
+router.patch(
+  '/:index',
+  body('producttype',nameLength ).optional().isLength({ min: 2 }),
+  body('producttype',nameOnlyLaters ).optional().isAlpha(),
+  param('index').optional().isInt({ min: 0 }),
+  body('productname', nameLength).optional().isLength({ min: 2 }),
+  body('productname', nameOnlyLaters).optional().isAlpha(),
+  body('productweight', weight).optional().isLength({ min: 1 }),
+  
+  
+  expressValidationResult,
+  update,
+);
+ 
+export default router

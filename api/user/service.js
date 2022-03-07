@@ -11,9 +11,9 @@ export async function getAllService() {
 }
 
 export async function getOneService(params) {
-  const index = Number(params.index);
-  const users = await readFile(usersUrl);
-  const user = users[index];
+   const index = Number(params.index);
+   const users = await readFile(usersUrl);
+   const user = users[index];
   return user;
 }
 
@@ -30,11 +30,25 @@ export async function createService(body) {
   return body;
 }
 
-export async function updateService(params, body) {
-  return params + body;
+export async function updateService(params,body) {
+  
+     const index = Number(params.index);
+     const users = await readFile(usersUrl);
+     for (const key of Object.keys(body)) {
+       if (users[index].hasOwnProperty(key)) {
+         users[index][key] = body[key];
+       }
+     }
+     await writeFile(usersUrl, users);
+  return body
 }
 
-export function removeService(params) {
+export async function removeService(params) {
+  
   const index = Number(params.index);
-  return index;
-}
+  let users = await readFile(usersUrl)
+     users.splice(index, 1);
+     
+      await writeFile(usersUrl,users)
+     return users
+     }

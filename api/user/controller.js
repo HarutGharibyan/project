@@ -4,7 +4,7 @@ import {
 
 export async function getAll(req, res, next) {
   try {
-    const geted = await getAllService();
+    const geted =  await getAllService();
     return res.send(geted);
   } catch (err) {
     return next(err);
@@ -13,7 +13,7 @@ export async function getAll(req, res, next) {
 export async function getOne(req, res, next) {
   try {
     const { params } = req;
-    const geted = getOneService(params);
+    const geted =  await getOneService(params);
     return res.send(geted);
   } catch (err) {
     return next(err);
@@ -40,8 +40,8 @@ export function update(req, res, next) {
 }
 export function remove(req, res, next) {
   try {
-    const { params } = req;
-    const removed = removeService(params);
+    const { params,body } = req;
+    const removed = removeService(params,body);
     return res.send(JSON.stringify(removed));
   } catch (err) {
     return next(err);

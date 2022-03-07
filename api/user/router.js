@@ -24,7 +24,9 @@ router.get(
   '/:id',
   param('id').custom(getValidator),
   expressValidationResult,
+
   getOne,
+
 );
 
 router.post(

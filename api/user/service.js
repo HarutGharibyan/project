@@ -2,12 +2,17 @@ import mongoose from 'mongoose';
 import User from '../../models/user.js';
 
 export async function getAllService() {
-  const users = await User.find();
+  const users = await User
+    .find()
+    .select(['username', 'fname', 'lname', 'age']);
   return users;
 }
 
 export async function getOneService(id) {
-  const user = await User.findById(id);
+  const user = await User
+    .findById(id)
+    .select(['username', 'fname', 'lname', 'age']);
+    // .select('username fname lname age');
   return user;
 }
 
@@ -22,11 +27,15 @@ export async function createService(body) {
 }
 
 export async function updateService(id, body) {
-  const user = await User.updateOne({ _id: id }, body);
+  const user = await User
+    .findByIdAndUpdate({ _id: id }, body, { new: true })
+    .select(['username', 'fname', 'lname', 'age']);
   return user;
 }
 
 export async function removeService(id) {
-  const user = await User.remove({ _id: id });
+  const user = await User
+    .findOneAndRemove({ _id: id })
+    .select(['username', 'fname', 'lname', 'age']);
   return user;
 }

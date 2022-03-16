@@ -1,27 +1,25 @@
 import mongoose from 'mongoose';
-// import Op from '../../models/product.js';
 import Order from '../../models/order.js';
 
+export async function getAllService() {
+  const products = await Order.find()
+    .populate('laptop', ['name', 'price']);
+  return products;
+}
 export async function getOneService(id) {
   const product = await Order
     .findById(id)
     .populate(
-      'product',
+      'laptop',
       ['name',
         'price',
-        'weigh',
-        'componyName',
-        'productType',
-        'foodType'],
+        'weight',
+        'brand',
+        'color'],
     );
 
   return product;
 }
-export async function getAllService() {
-  const products = await Order.find().populate('product', ['name', 'price']);
-  return products;
-}
-
 export async function createService(body) {
   const product = new Order({
     _id: mongoose.Types.ObjectId(),

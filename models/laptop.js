@@ -1,13 +1,12 @@
 import mongoose from 'mongoose';
 
-const Product = mongoose.model('Product', {
+const Product = mongoose.model('Laptop', {
   _id: mongoose.Schema.Types.ObjectId,
   name: String,
   price: Number,
-  weigh: Number,
-  componyName: String,
-  productType: String,
-  foodType: String,
+  weight: Number,
+  brand: String,
+  color: String,
 });
 
 export default Product;

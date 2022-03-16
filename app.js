@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import userRouter from './api/user/router.js';
-import productRouter from './api/product/router.js';
+import productRouter from './api/laptop/router.js';
 import orderRouter from './api/order/router.js';
 
 mongoose.connect('mongodb+srv://root:root@redbool.hpiqh.mongodb.net/redbool?retryWrites=true&w=majority');
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/user', userRouter);
-app.use('/product', productRouter);
+app.use('/laptop', productRouter);
 app.use('/order', orderRouter);
 
 // eslint-disable-next-line no-unused-vars

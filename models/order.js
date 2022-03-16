@@ -4,7 +4,7 @@ const Order = mongoose.model('Order', {
   _id: mongoose.Schema.Types.ObjectId,
   product: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+    ref: 'Laptop',
     required: true,
   },
   count: {

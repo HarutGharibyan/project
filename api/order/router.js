@@ -1,44 +1,46 @@
-// eslint-disable-next-line import/named
-
 import express from 'express';
 import { body, param } from 'express-validator';
-import {
-  getOne, getAll, create, update, remove,
-} from './controller.js';
-import {
-  prodError,
-} from './errorMessages.js';
-import { expressValidationResult } from '../../utils/middlewares.js';
-import { indexCostumValidatr } from './costumWalid.js';
-import { indexCostumValidatr as productIndexCostumValidatr } from '../product/costumWalid.js';
+import { expressValidationResult } from '../../utils/middleware.js';
+import * as controller from './controller.js';
+import * as errorMessages from '../../constants/errorMessages.js';
+import * as validator from './validator.js';
+import * as laptopValidator from '../laptop/validator.js';
 
 const router = express.Router();
 
-router.get('/', getAll);
+router.get('/', controller.getAll);
 
 router.get(
   '/:id',
-  param('id', prodError).custom(indexCostumValidatr),
-  getOne,
+  param('id', errorMessages.notFound).custom(validator.isExists),
+  controller.getOne,
 );
 
 router.post(
   '/',
-  body('product', 'fild is not fount').custom(productIndexCostumValidatr),
+  body('laptop', errorMessages.notFound).custom(laptopValidator.isExists),
+  body('count', errorMessages.integerErrMessage(1, 100000))
+    .optional().isInt({ min: 1, max: 100000 }),
   expressValidationResult,
-  create,
+  controller.create,
 );
 
 router.patch(
   '/:id',
+  param('id', errorMessages.notFound)
+    .custom(validator.isExists),
+  body('laptop', errorMessages.notAccessible)
+    .optional().custom(() => Promise.reject()),
+  body('count', errorMessages.integerErrMessage(1, 100000))
+    .optional().isInt({ min: 1, max: 100000 }),
   expressValidationResult,
-  update,
+  controller.update,
 );
 
 router.delete(
   '/:id',
-  param('id', prodError).custom(indexCostumValidatr),
+  param('id', errorMessages.notFound).custom(validator.isExists),
   expressValidationResult,
-  remove,
+  controller.remove,
 );
 export default router;

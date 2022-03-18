@@ -10,6 +10,7 @@ mongoose.connect('mongodb+srv://root:root@redbool.hpiqh.mongodb.net/redbool?retr
 const app = express();
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 app.use(morgan('dev'));
 
 app.use('/user', userRouter);
@@ -25,5 +26,7 @@ app.use((err, req, res, next) => {
     message: err.message,
   });
 });
+
+// app.use('/uploads/:fileName', orderRouter);
 
 export default app;

@@ -1,9 +1,22 @@
 import express from 'express';
+import multer from 'multer';
 import { body, param } from 'express-validator';
 import { expressValidationResult } from '../../utils/middleware.js';
 import * as controller from './controller.js';
 import * as errorMessages from '../../constants/errorMessages.js';
 import * as validator from './validator.js';
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, './uploads');
+  },
+  filename(req, file, cb) {
+    const data = new Date();
+    const name = data.getTime() + file.originalname;
+    cb(null, name.replace(/ /g, ''));
+  },
+});
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -17,6 +30,7 @@ router.get(
 
 router.post(
   '/',
+  upload.single('avatar'),
   body('name', errorMessages.stringErrMessage(4, 255))
     .isLength({ min: 4, max: 255 }),
   body('weight', errorMessages.integerErrMessage())

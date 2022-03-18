@@ -7,6 +7,7 @@ const Product = mongoose.model('Laptop', {
   weight: Number,
   brand: String,
   color: String,
+  fileName: String,
 });
 
 export default Product;

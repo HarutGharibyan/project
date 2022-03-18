@@ -23,7 +23,8 @@ export async function getAll(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const { body } = req;
+    const { body, file } = req;
+    body.fileName = file.filename;
     const createdProduct = await createService(body);
     return res.send(JSON.stringify(createdProduct));
   } catch (err) {

@@ -1,17 +1,26 @@
 import mongoose from 'mongoose';
-import Laptop from '../../models/laptop.js';
+import Pc from '../../models/pc.js';
 
 export async function getOneService(id) {
-  const geted = await Laptop.findById(id).populate('img');
+  const geted = await Pc.findById(id).populate([{
+    path: 'img',
+    select: ['fileName'],
+  }, {
+    path: 'mouse',
+    model: 'Mouse',
+    populate: {
+      path: 'img',
+    },
+  }]);
   return geted;
 }
 export async function getAllService() {
-  const geted = await Laptop.find().populate('img');
+  const geted = await Pc.find().populate('img').populate('mouse');
   return geted;
 }
 
 export async function createService(body) {
-  const created = new Laptop({
+  const created = new Pc({
     _id: mongoose.Types.ObjectId(),
     ...body,
   });
@@ -20,11 +29,11 @@ export async function createService(body) {
 }
 
 export async function updateService(body, id) {
-  const updated = await Laptop.updateOne({ _id: id }, body);
+  const updated = await Pc.updateOne({ _id: id }, body);
   return updated;
 }
 
 export async function removeService(id) {
-  const removed = await Laptop.remove({ _id: id });
+  const removed = await Pc.remove({ _id: id });
   return removed;
 }

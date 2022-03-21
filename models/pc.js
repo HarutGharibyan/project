@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
 
-const Laptop = mongoose.model('Laptop', {
+const Pc = mongoose.model('Pc', {
   _id: mongoose.Schema.Types.ObjectId,
   name: String,
   price: Number,
-  weight: Number,
-  brand: String,
-  color: String,
+  mouse: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Mouse',
+    required: true,
+  },
   img: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File',
@@ -14,4 +16,4 @@ const Laptop = mongoose.model('Laptop', {
   },
 });
 
-export default Laptop;
+export default Pc;
